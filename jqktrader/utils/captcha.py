@@ -4,25 +4,37 @@ import requests
 from PIL import Image
 
 from jqktrader import exceptions
+import pytesseract
 
-
+'''注释部分是原文件，20240901修改了def captcha_recognize(img_path)，修改后测试可用
 def captcha_recognize(img_path):
-    import pytesseract
+    """使用tesseract识别验证码"""
+    import pytesseract  # 导入tesseract库
 
+    # 打开图片并转换为灰度图像
     im = Image.open(img_path).convert("L")
-    # 1. threshold the image
-    threshold = 200
-    table = []
+    
+    # 1. 对图像进行阈值处理
+    threshold = 200  # 定义阈值
+    table = []  # 初始化映射表
     for i in range(256):
         if i < threshold:
-            table.append(0)
+            table.append(0)  # 小于阈值的像素设置为0（黑色）
         else:
-            table.append(1)
+            table.append(1)  # 大于阈值的像素设置为1（白色）
 
+    # 应用阈值处理
     out = im.point(table, "1")
-    # 2. recognize with tesseract
+    
+    # 2. 使用tesseract进行识别
     num = pytesseract.image_to_string(out)
-    return num
+    return num  # 返回识别结果
+'''
+def captcha_recognize(img_path):
+    """ 使用 pytesseract 识别验证码 """
+    captcha_image = Image.open(img_path)
+    captcha_text = pytesseract.image_to_string(captcha_image, config='--psm 8 outputbase digits')
+    return captcha_text.strip()
 
 
 def recognize_verify_code(image_path, broker="ht"):
