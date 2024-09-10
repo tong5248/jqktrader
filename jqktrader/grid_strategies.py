@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 
 import pandas as pd
 import pywinauto.keyboard
+from pywinauto import keyboard
 import pywinauto
 import pywinauto.clipboard
 
@@ -97,10 +98,14 @@ class Copy(BaseStrategy):
 
     def _get_clipboard_data(self) -> str:
         if Copy._need_captcha_reg:
+            top_window = self._trader.app.top_window()
+            self._trader.app.top_window().set_focus()
             if (
                     self._trader.app.top_window().window(class_name="Static", title_re="验证码").exists(timeout=1)
             ):
-                file_path = "tmp.png"
+                print('发现验证窗口，验证码图片保存地址e:\\同花顺软件\\同花顺\\captcha.png')
+                #file_path = "tmp.png"
+                file_path = 'e:\\同花顺软件\\同花顺\\captcha.png'
                 count = 5
                 found = False
                 while count > 0:
@@ -118,12 +123,14 @@ class Copy(BaseStrategy):
                             control_id=0x964, class_name="Edit"
                         ).set_focus()
 
-                        pywinauto.keyboard.SendKeys("{BKSP}{BKSP}{BKSP}{BKSP}")
-
-                        pywinauto.keyboard.SendKeys(captcha_num)
-
+                        # pywinauto.keyboard.SendKeys("{BKSP}{BKSP}{BKSP}{BKSP}")
+                        # pywinauto.keyboard.SendKeys(captcha_num)
+                        # 模拟键盘输入
+                        keyboard.send_keys("{BKSP}{BKSP}{BKSP}{BKSP}")
+                        keyboard.send_keys(captcha_num)
                         self._trader.app.top_window().set_focus()
-                        pywinauto.keyboard.SendKeys("{ENTER}")  # 模拟发送enter，点击确定
+                        #pywinauto.keyboard.SendKeys("{ENTER}")  # 模拟发送enter，点击确定
+                        keyboard.send_keys("{ENTER}")
 
                         if (self._trader.app.top_window().window(class_name="Static", title_re="验证码").exists(timeout=1)):
                             logger.info("验证码识别错误")
