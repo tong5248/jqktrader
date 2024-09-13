@@ -50,6 +50,14 @@ class PopDialogHandler:
                 best_match="确定"
             ).click()
 
+    def _submit_fengxian_click(self):
+        try:
+            # 尝试直接点击顶层窗口中的 "继续委托" 按钮
+            self._app.top_window()["继续委托"].click()
+        except Exception as ex:
+            # 最后一次尝试失败时，记录或处理异常
+            print(f"所有点击尝试失败: {ex}")
+   
     def _submit_by_shortcut(self):
         self._set_foreground(self._app.top_window())
         self._app.top_window().type_keys("%Y", set_foreground=False)
@@ -82,6 +90,10 @@ class TradePopDialogHandler(PopDialogHandler):
             if "正回购" in content:
                 self._submit_by_shortcut()
                 return None
+                
+            if "风险警示期股票" in content:
+                self._submit_fengxian_click()
+                return None    
 
             return None
 
